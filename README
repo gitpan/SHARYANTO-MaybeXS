@@ -1,0 +1,53 @@
+NAME
+    SHARYANTO::MaybeXS - Do task using a non-core XS module, but provide
+    pure-Perl fallback
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+     use SHARYANTO::MaybeXS qw(clone uniq);
+
+     my $clone = clone({blah=>1});
+
+DESCRIPTION
+    This module helps when you want to bootstrap your Perl application with
+    a portable, dependency-free Perl script. In a vanilla Perl installation
+    (having only core modules), you can use App::FatPacker to include
+    pure-Perl dependencies to your script. This module provides fallback for
+    some tasks that usually need to be done using a non-core XS module.
+
+FUNCTIONS
+  clone($data) => $cloned
+    Try to use Data::Clone's "clone", but fallback to Storable's "clone".
+    Note that currently Storable can't handle Regexp object out of the box.
+
+  uniq(@ary) => @uniq_ary
+    Try to use List::MoreUtils's "uniq", but fallback to using pure-Perl
+    implementation.
+
+SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/SHARYANTO-MaybeXS>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-SHARYANTO-MaybeXS>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=SHARYANTO-MaybeXS>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
