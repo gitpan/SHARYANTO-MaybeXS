@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 our $USE_XS = 1;
 
@@ -18,23 +18,19 @@ our @EXPORT_OK = qw(
 sub clone {
     my $data = shift;
     goto FALLBACK unless $USE_XS;
-    eval { require Data::Clone };
-    goto FALLBACK if $@;
+    goto FALLBACK unless eval { require Data::Clone; 1 };
 
   STANDARD:
     return Data::Clone::clone($data);
 
   FALLBACK:
-    require Storable;
-    local $Storable::Deparse = 1;
-    local $Storable::Eval    = 1;
-    return Storable::dclone($data);
+    require Clone::PP;
+    return Clone::PP::clone($data);
 }
 
 sub uniq {
     goto FALLBACK unless $USE_XS;
-    eval { require List::MoreUtils };
-    goto FALLBACK if $@;
+    goto FALLBACK unless eval { require List::MoreUtils; 1 };
 
   STANDARD:
     return List::MoreUtils::uniq(@_);
@@ -49,7 +45,7 @@ sub uniq {
 }
 
 1;
-#ABSTRACT: Do task using a non-core XS module, but provide pure-Perl fallback
+#ABSTRACT: Do task using non-core XS module, but provide pure-Perl/core fallback
 
 __END__
 
@@ -59,11 +55,11 @@ __END__
 
 =head1 NAME
 
-SHARYANTO::MaybeXS - Do task using a non-core XS module, but provide pure-Perl fallback
+SHARYANTO::MaybeXS - Do task using non-core XS module, but provide pure-Perl/core fallback
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -77,7 +73,8 @@ This module helps when you want to bootstrap your Perl application with a
 portable, dependency-free Perl script. In a vanilla Perl installation (having
 only core modules), you can use L<App::FatPacker> to include pure-Perl
 dependencies to your script. This module provides fallback for some tasks that
-usually need to be done using a non-core XS module.
+usually need to be done using a non-core XS module, by providing alternatives
+using pure-Perl or core XS module.
 
 =for Pod::Coverage ^()$
 
@@ -85,8 +82,7 @@ usually need to be done using a non-core XS module.
 
 =head2 clone($data) => $cloned
 
-Try to use L<Data::Clone>'s C<clone>, but fallback to L<Storable>'s C<clone>.
-Note that currently Storable can't handle Regexp object out of the box.
+Try to use L<Data::Clone>'s C<clone>, but fallback to L<Clone::PP>'s C<clone>.
 
 =head2 uniq(@ary) => @uniq_ary
 
@@ -94,6 +90,10 @@ Try to use L<List::MoreUtils>'s C<uniq>, but fallback to using pure-Perl
 implementation.
 
 =head1 SEE ALSO
+
+L<Clone::Any> can also uses multiple backends, but I avoid it because I don't
+think L<Storable>'s C<dclone> should be used (no Regexp support out of the box +
+must use deparse to handle coderefs).
 
 =head1 HOMEPAGE
 
